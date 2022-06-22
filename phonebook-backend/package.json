@@ -1,0 +1,32 @@
+{
+    "name": "phonebook-backend",
+    "version": "0.0.1",
+    "description": "Phonebook backend server",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "dev": "nodemon index.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jokerinya/fsopen-part3.git#main"
+    },
+    "keywords": [
+        "node",
+        "express",
+        "phonebook"
+    ],
+    "author": "Ibrahim Sakaci <sakacibrahim@gmail.com>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/jokerinya/fsopen-part3/issues"
+    },
+    "homepage": "https://github.com/jokerinya/fsopen-part3/tree/main#readme",
+    "dependencies": {
+        "express": "^4.18.1"
+    },
+    "devDependencies": {
+        "nodemon": "^2.0.16"
+    }
+}
