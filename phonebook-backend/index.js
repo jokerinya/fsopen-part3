@@ -1,10 +1,14 @@
 const express = require('express');
+const morgan = require('morgan');
 const app = express();
 
-app.use(express.json());
-
 const generateId = () => Math.random().toString().substring(2);
-
+// custom token for loging in morgan
+morgan.token('postData', function (req, res) {
+    if (req.method === 'POST') {
+        return JSON.stringify(req.body);
+    }
+});
 let persons = [
     {
         id: 1,
@@ -27,6 +31,14 @@ let persons = [
         number: '39-23-6423122',
     },
 ];
+/* Middlewares */
+app.use(express.json()); // json parser
+// logging tokens in morgan
+app.use(
+    morgan(
+        ':method :url :status :res[content-length] - :response-time ms :postData'
+    )
+);
 
 app.get('/info', (request, response) => {
     response.send(`
