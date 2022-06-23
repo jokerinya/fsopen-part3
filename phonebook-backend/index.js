@@ -42,6 +42,7 @@ app.use(
     )
 );
 app.use(cors());
+app.use(express.static('build'));
 
 app.get('/info', (request, response) => {
     response.send(`
@@ -76,7 +77,7 @@ app.post('/api/v1/persons', (request, response) => {
     const body = request.body;
 
     if (!body.name || !body.number) {
-        const missing = !!body.name ? 'Name' : 'Number';
+        const missing = !!body.name ? 'Number' : 'Name';
         return response.status(400).json({ error: `'${missing}' is missing` });
     }
 

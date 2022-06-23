@@ -67,13 +67,25 @@ const App = () => {
             id: (Math.random() + '').substring(2),
         };
 
-        personsService.create(newPerson).then((newAddedPerson) => {
-            setPersons([...persons, newAddedPerson]);
-            setNewName('');
-            setNewNumber('');
-            setMessage({ type: 'success', content: `Added ${newPerson.name}` });
-            clearNotification();
-        });
+        personsService
+            .create(newPerson)
+            .then((newAddedPerson) => {
+                setPersons([...persons, newAddedPerson]);
+                setNewName('');
+                setNewNumber('');
+                setMessage({
+                    type: 'success',
+                    content: `Added ${newPerson.name}`,
+                });
+                clearNotification();
+            })
+            .catch((error) => {
+                console.log(error.response.data);
+                setMessage({
+                    type: 'error',
+                    content: error.response.data.error || 'an error occured...',
+                });
+            });
     };
 
     const handleDeletePerson = (id) => {
