@@ -1,5 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
+const cors = require('cors');
+
 const app = express();
 
 const generateId = () => Math.random().toString().substring(2);
@@ -39,6 +41,7 @@ app.use(
         ':method :url :status :res[content-length] - :response-time ms :postData'
     )
 );
+app.use(cors());
 
 app.get('/info', (request, response) => {
     response.send(`
