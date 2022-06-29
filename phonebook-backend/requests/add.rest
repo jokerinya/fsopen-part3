@@ -19,5 +19,14 @@ Content-Type: application/json
 
 {
     "name": "John Doe",
-    "number": "045-2345678"
+    "number": "145-2345678"
+}
+
+###
+POST http://localhost:3001/api/v1/persons
+Content-Type: application/json
+
+{
+    "name": "Anna",
+    "number": "040-1234556"
 }

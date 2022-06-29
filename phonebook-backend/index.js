@@ -2,6 +2,8 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 
+const Person = require('./models/person');
+
 const app = express();
 
 const generateId = () => Math.random().toString().substring(2);
@@ -11,28 +13,28 @@ morgan.token('postData', function (req, res) {
         return JSON.stringify(req.body);
     }
 });
-let persons = [
-    {
-        id: 1,
-        name: 'Arto Hellas',
-        number: '040-123456',
-    },
-    {
-        id: 2,
-        name: 'Ada Lovelace',
-        number: '39-44-5323523',
-    },
-    {
-        id: 3,
-        name: 'Dan Abramov',
-        number: '12-43-234345',
-    },
-    {
-        id: 4,
-        name: 'Mary Poppendieck',
-        number: '39-23-6423122',
-    },
-];
+// let persons = [
+//     {
+//         id: 1,
+//         name: 'Arto Hellas',
+//         number: '040-123456',
+//     },
+//     {
+//         id: 2,
+//         name: 'Ada Lovelace',
+//         number: '39-44-5323523',
+//     },
+//     {
+//         id: 3,
+//         name: 'Dan Abramov',
+//         number: '12-43-234345',
+//     },
+//     {
+//         id: 4,
+//         name: 'Mary Poppendieck',
+//         number: '39-23-6423122',
+//     },
+// ];
 /* Middlewares */
 app.use(express.json()); // json parser
 // logging tokens in morgan
@@ -52,48 +54,59 @@ app.get('/info', (request, response) => {
 });
 
 app.get('/api/v1/persons', (request, response) => {
-    response.status(200).json(persons);
+    Person.find({})
+        .then((persons) => {
+            response.status(200).json(persons);
+        })
+        .catch((error) => response.status(400).json({ error: error.message }));
 });
 
 app.get('/api/v1/persons/:id', (request, response) => {
-    const id = +request.params.id;
-    const person = persons.find((person) => person.id === id);
-    if (person) {
-        response.json(person);
-    } else {
-        response.statusMessage = 'There is not a user with this id number';
-        response.status(404).end();
-    }
+    const id = request.params.id;
+    Person.findById(id)
+        .then((person) => {
+            response.status(200).json(person);
+        })
+        .catch((error) => response.status(404).json({ error: error.message }));
 });
 
 app.delete('/api/v1/persons/:id', (request, response) => {
-    const id = Number(request.params.id);
-    persons = persons.filter((person) => person.id !== id);
-
-    response.status(204).end();
+    const id = request.params.id;
+    Person.findByIdAndDelete(id)
+        .then((person) => {
+            if (!person) {
+                response.status(400).send(id + ' was not found');
+            } else {
+                response.status(200).send(`${person.name} was deleted.`);
+            }
+        })
+        .catch((err) => {
+            console.error(err.message);
+            response.status(500).send('Error: ' + err.message);
+        });
 });
 
 app.post('/api/v1/persons', (request, response) => {
-    const body = request.body;
+    const { name, number } = request.body;
 
-    if (!body.name || !body.number) {
-        const missing = !!body.name ? 'Number' : 'Name';
+    if (!name || !number) {
+        const missing = !!name ? 'Number' : 'Name';
         return response.status(400).json({ error: `'${missing}' is missing` });
     }
 
-    const exist = persons.find((p) => p.name === body.name);
-    if (exist) {
-        return response.status(400).json({ error: 'name must be uniqe' });
-    }
-
-    const person = {
-        name: body.name,
-        id: generateId(),
-        number: body.number,
-    };
-
-    persons = persons.concat(person);
-    response.json(person);
+    Person.findOne({ name: name }).then((person) => {
+        if (person) {
+            response
+                .status(400)
+                .json({ error: `${person.name} name must be uniqe` });
+        } else {
+            const person = new Person({
+                name: name,
+                number: number,
+            });
+            person.save().then((savedPerson) => response.json(savedPerson));
+        }
+    });
 });
 
 const PORT = process.env.PORT || 3001;
