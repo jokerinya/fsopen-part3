@@ -69,7 +69,11 @@ app.get('/api/v1/persons/:id', (request, response, next) => {
     const id = request.params.id;
     Person.findById(id)
         .then((person) => {
-            response.status(200).json(person);
+            if (person) {
+                response.status(200).json(person);
+            } else {
+                response.status(404).end();
+            }
         })
         .catch((error) => next(error));
 });
@@ -125,7 +129,6 @@ app.put('/api/v1/persons/:id', (request, response, next) => {
     // {new: true} provides us the updatedNote instead of oldNote
     Person.findByIdAndUpdate(request.params.id, person, { new: true })
         .then((updatedPerson) => {
-            console.log(updatedPerson);
             response.json(updatedPerson);
         })
         .catch((error) => next(error));
