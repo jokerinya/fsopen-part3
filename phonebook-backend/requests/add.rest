@@ -30,3 +30,12 @@ Content-Type: application/json
     "name": "Anna",
     "number": "040-1234556"
 }
+
+###
+POST http://localhost:3001/api/v1/persons
+Content-Type: application/json
+
+{
+    "name": "Arto Hellas",
+    "number": "040-2344568"
+}

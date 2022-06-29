@@ -46,47 +46,48 @@ app.use(
 app.use(cors());
 app.use(express.static('build'));
 
-app.get('/info', (request, response) => {
-    response.send(`
+app.get('/info', (request, response, next) => {
+    Person.find({})
+        .then((persons) => {
+            response.send(`
         <p>Phonebook has info for ${persons.length} people</p>
         <p>${new Date()}</p>
-    `);
+        `);
+        })
+        .catch((error) => next(error));
 });
 
-app.get('/api/v1/persons', (request, response) => {
+app.get('/api/v1/persons', (request, response, next) => {
     Person.find({})
         .then((persons) => {
             response.status(200).json(persons);
         })
-        .catch((error) => response.status(400).json({ error: error.message }));
+        .catch((error) => next(error));
 });
 
-app.get('/api/v1/persons/:id', (request, response) => {
+app.get('/api/v1/persons/:id', (request, response, next) => {
     const id = request.params.id;
     Person.findById(id)
         .then((person) => {
             response.status(200).json(person);
         })
-        .catch((error) => response.status(404).json({ error: error.message }));
+        .catch((error) => next(error));
 });
 
-app.delete('/api/v1/persons/:id', (request, response) => {
+app.delete('/api/v1/persons/:id', (request, response, next) => {
     const id = request.params.id;
     Person.findByIdAndDelete(id)
         .then((person) => {
             if (!person) {
                 response.status(400).send(id + ' was not found');
             } else {
-                response.status(200).send(`${person.name} was deleted.`);
+                response.status(204).send(`${person.name} was deleted.`);
             }
         })
-        .catch((err) => {
-            console.error(err.message);
-            response.status(500).send('Error: ' + err.message);
-        });
+        .catch((error) => next(error));
 });
 
-app.post('/api/v1/persons', (request, response) => {
+app.post('/api/v1/persons', (request, response, next) => {
     const { name, number } = request.body;
 
     if (!name || !number) {
@@ -94,20 +95,61 @@ app.post('/api/v1/persons', (request, response) => {
         return response.status(400).json({ error: `'${missing}' is missing` });
     }
 
-    Person.findOne({ name: name }).then((person) => {
-        if (person) {
-            response
-                .status(400)
-                .json({ error: `${person.name} name must be uniqe` });
-        } else {
-            const person = new Person({
-                name: name,
-                number: number,
-            });
-            person.save().then((savedPerson) => response.json(savedPerson));
-        }
-    });
+    Person.findOne({ name: name })
+        .then((person) => {
+            if (person) {
+                response
+                    .status(400)
+                    .json({ error: `${person.name} name must be uniqe` });
+            } else {
+                const person = new Person({
+                    name: name,
+                    number: number,
+                });
+                person.save().then((savedPerson) => response.json(savedPerson));
+            }
+        })
+        .catch((error) => next(error));
 });
+
+app.put('/api/v1/persons/:id', (request, response, next) => {
+    const { name, number } = request.body;
+
+    if (!name || !number) {
+        const missing = !!name ? 'Number' : 'Name';
+        return response.status(400).json({ error: `'${missing}' is missing` });
+    }
+
+    const person = { name, number };
+
+    // {new: true} provides us the updatedNote instead of oldNote
+    Person.findByIdAndUpdate(request.params.id, person, { new: true })
+        .then((updatedPerson) => {
+            console.log(updatedPerson);
+            response.json(updatedPerson);
+        })
+        .catch((error) => next(error));
+});
+
+/* Put it at the end of the routes */
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' });
+};
+
+app.use(unknownEndpoint);
+
+const errorHandler = (error, request, response, next) => {
+    console.log('errorHandler', error.message);
+    console.log(error.message);
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({ error: 'malformatted id' });
+    }
+
+    next(error);
+};
+// this has to be the last loaded middleware
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT);

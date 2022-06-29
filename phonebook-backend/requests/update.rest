@@ -1,0 +1,32 @@
+PUT http://localhost:3001/api/v1/persons/1
+Content-Type: application/json
+
+{
+    "number": "045-2345678",
+    "name": "John Doe"
+}
+
+###
+PUT http://localhost:3001/api/v1/persons/62b604844225b48c65180f89
+Content-Type: application/json
+
+{
+    "name": "John Doe"
+}
+
+###
+PUT http://localhost:3001/api/v1/persons/62b604844225b48c65180f89
+Content-Type: application/json
+
+{
+    "number": "145-2345678"
+}
+
+###
+PUT http://localhost:3001/api/v1/persons/62b604844225b48c65180f89
+Content-Type: application/json
+
+{
+    "name": "ARTO UPDATED",
+    "number": "040-9999999"
+}
