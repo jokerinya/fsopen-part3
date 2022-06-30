@@ -2,7 +2,7 @@ PUT http://localhost:3001/api/v1/persons/1
 Content-Type: application/json
 
 {
-    "number": "045-2345678",
+    "number": "045-234-5678",
     "name": "John Doe"
 }
 
@@ -23,10 +23,18 @@ Content-Type: application/json
 }
 
 ###
-PUT http://localhost:3001/api/v1/persons/62b604844225b48c65180f89
+PUT http://localhost:3001/api/v1/persons/62bdcd9b383083338ba52355
 Content-Type: application/json
 
 {
     "name": "ARTO UPDATED",
-    "number": "040-9999999"
+    "number": "040-999-999"
+}
+###
+PUT http://localhost:3001/api/v1/persons/62bdcd9b383083338ba52355
+Content-Type: application/json
+
+{
+    "name": "ARTO UPDATED",
+    "number": "040-999-9996"
 }

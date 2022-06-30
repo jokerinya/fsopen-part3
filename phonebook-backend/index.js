@@ -72,7 +72,9 @@ app.get('/api/v1/persons/:id', (request, response, next) => {
             if (person) {
                 response.status(200).json(person);
             } else {
-                response.status(404).end();
+                response.status(404).json({
+                    error: `No person with this id: '${request.params.id}'`,
+                });
             }
         })
         .catch((error) => next(error));
@@ -110,7 +112,10 @@ app.post('/api/v1/persons', (request, response, next) => {
                     name: name,
                     number: number,
                 });
-                person.save().then((savedPerson) => response.json(savedPerson));
+                person
+                    .save()
+                    .then((savedPerson) => response.json(savedPerson))
+                    .catch((error) => next(error));
             }
         })
         .catch((error) => next(error));
@@ -127,9 +132,19 @@ app.put('/api/v1/persons/:id', (request, response, next) => {
     const person = { name, number };
 
     // {new: true} provides us the updatedNote instead of oldNote
-    Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    Person.findByIdAndUpdate(request.params.id, person, {
+        new: true,
+        runValidators: true,
+        context: 'query',
+    })
         .then((updatedPerson) => {
-            response.json(updatedPerson);
+            if (updatedPerson) {
+                response.status(200).json(updatedPerson);
+            } else {
+                response.status(400).json({
+                    error: `No person with this id: '${request.params.id}'`,
+                });
+            }
         })
         .catch((error) => next(error));
 });
@@ -147,6 +162,8 @@ const errorHandler = (error, request, response, next) => {
 
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' });
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).json({ error: error.message });
     }
 
     next(error);

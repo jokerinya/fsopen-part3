@@ -6,6 +6,7 @@ const PersonForm = ({
     onNameChange,
     newNumberValue,
     onNumberChange,
+    numberFormat,
 }) => {
     return (
         <form onSubmit={onFormSubmit}>
@@ -14,11 +15,11 @@ const PersonForm = ({
             </div>
             <div>
                 number:{' '}
-                <input
-                    value={newNumberValue}
-                    onChange={onNumberChange}
-                    type='number'
-                />
+                <input value={newNumberValue} onChange={onNumberChange} />
+                <br />
+                format must bu 0DD-DDDDDDD or 0D-DDDDDDD
+                <br />
+                your format is {numberFormat ? 'OK' : 'IS NOT OK'}
             </div>
             <div>
                 <button type='submit'>add</button>

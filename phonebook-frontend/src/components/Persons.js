@@ -6,7 +6,7 @@ const Persons = ({ persons, onDeletePerson }) => {
         <>
             {persons.map((person) => (
                 <Person
-                    key={person.name}
+                    key={person.id}
                     person={person}
                     onDeletePerson={() => onDeletePerson(person.id)}
                 />

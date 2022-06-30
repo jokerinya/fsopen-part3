@@ -10,6 +10,7 @@ const App = () => {
     const [persons, setPersons] = useState([]);
     const [newName, setNewName] = useState('');
     const [newNumber, setNewNumber] = useState('');
+    const [numberFormat, setNumberFormat] = useState(false);
     const [nameFilter, setNameFilter] = useState('');
     const [message, setMessage] = useState({ type: null, content: null });
 
@@ -20,7 +21,10 @@ const App = () => {
     }, []);
 
     const handleNameChange = (event) => setNewName(event.target.value);
-    const handleNumberChange = (event) => setNewNumber(event.target.value);
+    const handleNumberChange = (event) => {
+        setNewNumber(event.target.value);
+        setNumberFormat(/0[0-9]{1,2}-[0-9]{7,}/.test(event.target.value));
+    };
     const handleNameFilterChange = (event) => setNameFilter(event.target.value);
 
     const nameIsAdded = () => {
@@ -40,8 +44,9 @@ const App = () => {
             if (!response) return;
             // user wants to update the number
             const existingPerson = persons.find(
-                (person) => person.name === newName
+                (person) => person.name.toLowerCase() === newName.toLowerCase()
             );
+            console.log(existingPerson);
             const newPerson = { ...existingPerson, number: newNumber };
             personsService
                 .update(newPerson.id, newPerson)
@@ -57,6 +62,17 @@ const App = () => {
                         type: 'success',
                         content: `Updated ${newPerson.name}`,
                     });
+                    setNewName('');
+                    setNewNumber('');
+                    clearNotification();
+                })
+                .catch((error) => {
+                    console.log(error.response.data);
+                    setMessage({
+                        type: 'error',
+                        content:
+                            error.response.data.error || 'an error occured...',
+                    });
                     clearNotification();
                 });
             return;
@@ -64,7 +80,6 @@ const App = () => {
         const newPerson = {
             name: newName,
             number: newNumber,
-            id: (Math.random() + '').substring(2),
         };
 
         personsService
@@ -141,6 +156,7 @@ const App = () => {
                 onNameChange={handleNameChange}
                 newNumberValue={newNumber}
                 onNumberChange={handleNumberChange}
+                numberFormat={numberFormat}
             />
 
             <h2>Numbers</h2>

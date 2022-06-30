@@ -2,7 +2,7 @@ POST http://localhost:3001/api/v1/persons
 Content-Type: application/json
 
 {
-    "number": "045-2345678"
+    "number": "045-234-5678"
 }
 
 ###
@@ -19,7 +19,16 @@ Content-Type: application/json
 
 {
     "name": "John Doe",
-    "number": "145-2345678"
+    "number": "145-234-567"
+}
+
+###
+POST http://localhost:3001/api/v1/persons
+Content-Type: application/json
+
+{
+    "name": "John Doe",
+    "number": "145-234-5678"
 }
 
 ###
@@ -28,7 +37,7 @@ Content-Type: application/json
 
 {
     "name": "Anna",
-    "number": "040-1234556"
+    "number": "040-123-4556"
 }
 
 ###
@@ -37,5 +46,5 @@ Content-Type: application/json
 
 {
     "name": "Arto Hellas",
-    "number": "040-2344568"
+    "number": "040-234-4568"
 }
