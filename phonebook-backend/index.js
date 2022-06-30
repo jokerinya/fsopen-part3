@@ -6,9 +6,8 @@ const Person = require('./models/person');
 
 const app = express();
 
-const generateId = () => Math.random().toString().substring(2);
 // custom token for loging in morgan
-morgan.token('postData', function (req, res) {
+morgan.token('postData', function (req) {
     if (req.method === 'POST') {
         return JSON.stringify(req.body);
     }
@@ -97,7 +96,7 @@ app.post('/api/v1/persons', (request, response, next) => {
     const { name, number } = request.body;
 
     if (!name || !number) {
-        const missing = !!name ? 'Number' : 'Name';
+        const missing = !name ? 'Name' : 'Number';
         return response.status(400).json({ error: `'${missing}' is missing` });
     }
 
@@ -125,7 +124,7 @@ app.put('/api/v1/persons/:id', (request, response, next) => {
     const { name, number } = request.body;
 
     if (!name || !number) {
-        const missing = !!name ? 'Number' : 'Name';
+        const missing = !name ? 'Name' : 'Number';
         return response.status(400).json({ error: `'${missing}' is missing` });
     }
 
